@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = 'https://umersaeed.duckdns.org'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -89,6 +89,19 @@ export const experienceAPI = {
   
   delete: async (experienceId) => {
     const response = await api.delete(`/experiences/${experienceId}`)
+    return response.data
+  },
+}
+
+// Settings endpoints
+export const settingsAPI = {
+  get: async () => {
+    const response = await api.get('/settings')
+    return response.data
+  },
+  
+  update: async (settingsData) => {
+    const response = await api.put('/settings', settingsData)
     return response.data
   },
 }

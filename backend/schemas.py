@@ -2,6 +2,34 @@ from pydantic import BaseModel, HttpUrl
 from typing import Optional, List
 from datetime import datetime
 
+# Settings Schemas
+class SettingsBase(BaseModel):
+    font_size: Optional[str] = "medium"
+    theme: Optional[str] = "light"
+    email: Optional[str] = None
+    github_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    twitter_url: Optional[str] = None
+
+class SettingsCreate(SettingsBase):
+    pass
+
+class SettingsUpdate(BaseModel):
+    font_size: Optional[str] = None
+    theme: Optional[str] = None
+    email: Optional[str] = None
+    github_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    twitter_url: Optional[str] = None
+
+class Settings(SettingsBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
 # Hero Schemas
 class HeroBase(BaseModel):
     name: str
@@ -112,3 +140,4 @@ class PortfolioData(BaseModel):
     featured_projects: List[Project] = []
     projects: List[Project] = []
     experiences: List[Experience] = []
+    settings: Optional[Settings] = None

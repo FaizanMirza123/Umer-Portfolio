@@ -10,8 +10,8 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Admin Configuration
-ADMIN_USERNAME = config("ADMIN_USERNAME", default="admin")
-ADMIN_PASSWORD = config("ADMIN_PASSWORD", default="admin123")
+ADMIN_USERNAME = config("ADMIN_USERNAME", default="umar_saeed")
+ADMIN_PASSWORD = config("ADMIN_PASSWORD", default="Umar_Saeed_13579")
 
 # CORS Configuration
 CORS_ORIGINS = [
@@ -19,4 +19,5 @@ CORS_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
+    "https://umer-saeed.vercel.app"
 ]

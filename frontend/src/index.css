@@ -15,6 +15,30 @@
     line-height: 1.6;
     color: #1f2937;
     background-color: #ffffff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Dark theme styles */
+  .dark body {
+    color: #f3f4f6;
+    background-color: #111827;
+  }
+  
+  /* Font size classes */
+  .font-small {
+    font-size: 14px;
+  }
+  
+  .font-medium {
+    font-size: 16px;
+  }
+  
+  .font-large {
+    font-size: 18px;
+  }
+  
+  .font-extra-large {
+    font-size: 20px;
   }
   
   * {

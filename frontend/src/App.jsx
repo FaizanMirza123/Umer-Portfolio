@@ -1,106 +1,148 @@
-import { useState, useEffect } from 'react'
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import FeaturedWork from './components/FeaturedWork'
-import Projects from './components/Projects'
-import Experiences from './components/Experiences'
-import Footer from './components/Footer'
-import AdminLogin from './components/AdminLogin'
-import AdminDashboard from './components/AdminDashboard'
-import { portfolioAPI } from './services/api'
-import './App.css'
+import { useState, useEffect } from "react";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import FeaturedWork from "./components/FeaturedWork";
+import Projects from "./components/Projects";
+import Experiences from "./components/Experiences";
+import Footer from "./components/Footer";
+import AdminLogin from "./components/AdminLogin";
+import AdminDashboard from "./components/AdminDashboard";
+import { portfolioAPI } from "./services/api";
+import "./App.css";
 
 function App() {
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [showAdminLogin, setShowAdminLogin] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [portfolioData, setPortfolioData] = useState({
     hero: {
-      name: 'Umer Saeed',
-      title: 'Full Stack Developer',
-      description: "Hey, I'm Umer Saeed. Here, you can check out what I'm working on. I try my best to create things with code.",
-      profileImage: null
+      name: "Umer Saeed",
+      title: "Full Stack Developer",
+      description:
+        "Hey, I'm Umer Saeed. Here, you can check out what I'm working on. I try my best to create things with code.",
+      profileImage: null,
     },
     featured_projects: [],
     projects: [],
-    experiences: []
-  })
-  const [loading, setLoading] = useState(true)
+    experiences: [],
+    settings: {
+      font_size: "medium",
+      theme: "light",
+    },
+  });
+  const [loading, setLoading] = useState(true);
 
   // Check if user is already logged in
   useEffect(() => {
-    const adminToken = localStorage.getItem('adminToken')
-    if (adminToken && adminToken !== 'true') {
-      setIsAdmin(true)
+    const adminToken = localStorage.getItem("adminToken");
+    if (adminToken && adminToken !== "true") {
+      setIsAdmin(true);
     }
-  }, [])
+  }, []);
+
+  // Apply theme and font size classes to body
+  useEffect(() => {
+    const { theme, font_size } = portfolioData.settings;
+
+    // Apply theme
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    // Apply font size
+    const fontSizeClasses = [
+      "font-small",
+      "font-medium",
+      "font-large",
+      "font-extra-large",
+    ];
+    fontSizeClasses.forEach((cls) =>
+      document.documentElement.classList.remove(cls)
+    );
+
+    if (font_size) {
+      document.documentElement.classList.add(
+        `font-${font_size.replace("-", "-")}`
+      );
+    }
+  }, [portfolioData.settings]);
 
   // Fetch portfolio data on component mount
   useEffect(() => {
     const fetchPortfolioData = async () => {
       try {
-        const data = await portfolioAPI.getAll()
+        const data = await portfolioAPI.getAll();
         setPortfolioData({
           hero: data.hero || portfolioData.hero,
           featured_projects: data.featured_projects || [],
           projects: data.projects || [],
-          experiences: data.experiences || []
-        })
+          experiences: data.experiences || [],
+          settings: data.settings || { font_size: "medium", theme: "light" },
+        });
       } catch (error) {
-        console.error('Error fetching portfolio data:', error)
+        console.error("Error fetching portfolio data:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchPortfolioData()
-  }, [])
+    fetchPortfolioData();
+  }, []);
 
   const handleAdminLogin = (success, token) => {
     if (success && token) {
-      setIsAdmin(true)
-      setShowAdminLogin(false)
-      localStorage.setItem('adminToken', token)
+      setIsAdmin(true);
+      setShowAdminLogin(false);
+      localStorage.setItem("adminToken", token);
     }
-  }
+  };
 
   const handleAdminLogout = () => {
-    setIsAdmin(false)
-    localStorage.removeItem('adminToken')
-  }
+    setIsAdmin(false);
+    localStorage.removeItem("adminToken");
+  };
 
   if (showAdminLogin) {
-    return <AdminLogin onLogin={handleAdminLogin} onCancel={() => setShowAdminLogin(false)} />
+    return (
+      <AdminLogin
+        onLogin={handleAdminLogin}
+        onCancel={() => setShowAdminLogin(false)}
+      />
+    );
   }
 
   if (isAdmin) {
-    return <AdminDashboard 
-      portfolioData={portfolioData} 
-      setPortfolioData={setPortfolioData}
-      onLogout={handleAdminLogout} 
-    />
+    return (
+      <AdminDashboard
+        portfolioData={portfolioData}
+        setPortfolioData={setPortfolioData}
+        onLogout={handleAdminLogout}
+      />
+    );
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading portfolio...</p>
+          <p className="text-black dark:text-black">Loading portfolio...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans w-full overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans w-full overflow-x-hidden transition-colors duration-300">
       <Navbar onAdminClick={() => setShowAdminLogin(true)} />
       <Hero data={portfolioData.hero} />
       <FeaturedWork projects={portfolioData.featured_projects} />
       <Projects projects={portfolioData.projects} />
       <Experiences experiences={portfolioData.experiences} />
-      <Footer />
+      <Footer settings={portfolioData.settings} />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

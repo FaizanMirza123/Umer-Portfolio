@@ -11,11 +11,12 @@ import json
 
 # Import local modules
 from db import get_db, engine
-from models import Base, Hero, Project, Experience
+from models import Base, Hero, Project, Experience, Settings
 from schemas import (
     HeroCreate, HeroUpdate, Hero as HeroSchema,
     ProjectCreate, ProjectUpdate, Project as ProjectSchema,
     ExperienceCreate, ExperienceUpdate, Experience as ExperienceSchema,
+    SettingsCreate, SettingsUpdate, Settings as SettingsSchema,
     UserLogin, Token, PortfolioData
 )
 from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, ADMIN_USERNAME, ADMIN_PASSWORD, CORS_ORIGINS
@@ -105,11 +106,28 @@ async def get_portfolio_data(db: Session = Depends(get_db)):
     # Get experiences
     experiences = db.query(Experience).all()
     
+    # Get settings
+    settings = db.query(Settings).first()
+    if not settings:
+        # Create default settings if none exist
+        settings = Settings(
+            font_size="medium", 
+            theme="light",
+            email="umer.saeed@example.com",
+            github_url="https://github.com",
+            linkedin_url="https://linkedin.com",
+            twitter_url="https://twitter.com"
+        )
+        db.add(settings)
+        db.commit()
+        db.refresh(settings)
+    
     return PortfolioData(
         hero=hero,
         featured_projects=featured_projects,
         projects=projects,
-        experiences=experiences
+        experiences=experiences,
+        settings=settings
     )
 
 # Hero endpoints
@@ -256,6 +274,48 @@ async def delete_experience(
     db.delete(db_experience)
     db.commit()
     return {"message": "Experience deleted successfully"}
+
+# Settings endpoints
+@app.get("/settings", response_model=SettingsSchema)
+async def get_settings(db: Session = Depends(get_db)):
+    settings = db.query(Settings).first()
+    if not settings:
+        # Create default settings if none exist
+        settings = Settings(
+            font_size="medium", 
+            theme="light",
+            email="umer.saeed@example.com",
+            github_url="https://github.com",
+            linkedin_url="https://linkedin.com",
+            twitter_url="https://twitter.com"
+        )
+        db.add(settings)
+        db.commit()
+        db.refresh(settings)
+    return settings
+
+@app.put("/settings", response_model=SettingsSchema)
+async def update_settings(
+    settings_data: SettingsUpdate,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(verify_token)
+):
+    db_settings = db.query(Settings).first()
+    if not db_settings:
+        # Create new settings if none exist
+        db_settings = Settings(font_size="medium", theme="light")
+        db.add(db_settings)
+        db.commit()
+        db.refresh(db_settings)
+    
+    update_data = settings_data.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_settings, field, value)
+    
+    db_settings.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(db_settings)
+    return db_settings
 
 if __name__ == "__main__":
     import uvicorn

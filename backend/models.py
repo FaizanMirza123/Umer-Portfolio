@@ -1,8 +1,21 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Text, DateTime, JSON, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
 Base = declarative_base()
+
+class Settings(Base):
+    __tablename__ = "settings"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    font_size = Column(String(10), default="medium")  # small, medium, large, extra-large
+    theme = Column(String(10), default="light")  # light, dark
+    email = Column(String(255), nullable=True)
+    github_url = Column(String(255), nullable=True)
+    linkedin_url = Column(String(255), nullable=True)
+    twitter_url = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class Hero(Base):
     __tablename__ = "heroes"
