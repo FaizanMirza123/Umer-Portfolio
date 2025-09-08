@@ -491,41 +491,160 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
               key={project.id || index}
               className="bg-white p-4 rounded-lg border"
             >
-              <div className="flex text-left text-black text-black">
-                <div>
-                  <h4 className="font-medium">{project.title}</h4>
-                  <p className="text-sm text-blackmt-1">
-                    {project.description}
-                  </p>
-                  {project.technologies && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {project.technologies.map((tech, techIndex) => (
-                        <span
-                          key={techIndex}
-                          className="px-2 py-1 bg-gray-100 text-xs rounded"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+              {editMode?.section === section && editMode?.index === index ? (
+                // Edit form for existing project
+                <div className="bg-gray-50 p-6 rounded-lg space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-black text-left">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      value={tempData.title || ""}
+                      onChange={(e) =>
+                        setTempData({ ...tempData, title: e.target.value })
+                      }
+                      className="w-full p-2 border rounded-lg text-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-black text-left">
+                      Description
+                    </label>
+                    <textarea
+                      value={tempData.description || ""}
+                      onChange={(e) =>
+                        setTempData({
+                          ...tempData,
+                          description: e.target.value,
+                        })
+                      }
+                      className="w-full p-2 border rounded-lg text-black h-24"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-black text-left">
+                      Image URL
+                    </label>
+                    <input
+                      type="url"
+                      value={tempData.image || ""}
+                      onChange={(e) =>
+                        setTempData({ ...tempData, image: e.target.value })
+                      }
+                      className="w-full p-2 border rounded-lg text-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-black text-left">
+                      GitHub URL
+                    </label>
+                    <input
+                      type="url"
+                      value={tempData.github_url || tempData.githubUrl || ""}
+                      onChange={(e) =>
+                        setTempData({ ...tempData, github_url: e.target.value })
+                      }
+                      className="w-full p-2 border rounded-lg text-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-black text-left">
+                      Live URL
+                    </label>
+                    <input
+                      type="url"
+                      value={tempData.live_url || tempData.liveUrl || ""}
+                      onChange={(e) =>
+                        setTempData({ ...tempData, live_url: e.target.value })
+                      }
+                      className="w-full p-2 border rounded-lg text-black"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-black text-left">
+                      Technologies (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        tempData.technologies
+                          ? tempData.technologies.join(", ")
+                          : ""
+                      }
+                      onChange={(e) =>
+                        handleArrayField("technologies", e.target.value)
+                      }
+                      className="w-full p-2 border rounded-lg text-black"
+                      placeholder="React, Node.js, MongoDB"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSave}
+                      disabled={loading}
+                      className="bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {loading ? (
+                        <RefreshCw size={16} className="animate-spin" />
+                      ) : (
+                        <Save size={16} />
+                      )}
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditMode(null)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                    >
+                      <X size={16} />
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(section, index)}
-                    className="text-teal-600 hover:text-teal-700"
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(section, index)}
-                    className="text-red-600 hover:text-red-700"
-                    disabled={loading}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+              ) : (
+                // Display project
+                <div className="flex text-left text-black">
+                  <div>
+                    <h4 className="font-medium">{project.title}</h4>
+                    <p className="text-sm text-blackmt-1">
+                      {project.description}
+                    </p>
+                    {project.technologies && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {project.technologies.map((tech, techIndex) => (
+                          <span
+                            key={techIndex}
+                            className="px-2 py-1 bg-gray-100 text-xs rounded"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(section, index)}
+                      className="text-teal-600 hover:text-teal-700"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(section, index)}
+                      className="text-red-600 hover:text-red-700"
+                      disabled={loading}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ))}
 
@@ -683,45 +802,165 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
               key={experience.id || index}
               className="bg-white p-4 rounded-lg border"
             >
-              <div className="flex text-left text-black text-black">
-                <div>
-                  <h4 className="font-medium">{experience.title}</h4>
-                  <p className="text-teal-600">{experience.company}</p>
-                  <p className="text-sm text-black">
-                    {experience.duration} • {experience.location}
-                  </p>
-                  <p className="text-sm text-black mt-1">
-                    {experience.description}
-                  </p>
-                  {experience.skills && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {experience.skills.map((skill, skillIndex) => (
-                        <span
-                          key={skillIndex}
-                          className="px-2 py-1 bg-gray-100 text-xs rounded"
-                        >
-                          {skill}
-                        </span>
-                      ))}
+              {editMode?.section === "experiences" &&
+              editMode?.index === index ? (
+                // Edit form for existing experience
+                <div className="bg-gray-50 p-6 rounded-lg space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-black text-left">
+                        Job Title
+                      </label>
+                      <input
+                        type="text"
+                        value={tempData.title || ""}
+                        onChange={(e) =>
+                          setTempData({ ...tempData, title: e.target.value })
+                        }
+                        className="w-full p-2 border rounded-lg text-black"
+                      />
                     </div>
-                  )}
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-black text-left">
+                        Company
+                      </label>
+                      <input
+                        type="text"
+                        value={tempData.company || ""}
+                        onChange={(e) =>
+                          setTempData({ ...tempData, company: e.target.value })
+                        }
+                        className="w-full p-2 border rounded-lg text-black"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-black text-left">
+                        Duration
+                      </label>
+                      <input
+                        type="text"
+                        value={tempData.duration || ""}
+                        onChange={(e) =>
+                          setTempData({ ...tempData, duration: e.target.value })
+                        }
+                        className="w-full p-2 border rounded-lg text-black"
+                        placeholder="Jan 2023 - Present"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-black text-left">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        value={tempData.location || ""}
+                        onChange={(e) =>
+                          setTempData({ ...tempData, location: e.target.value })
+                        }
+                        className="w-full p-2 border rounded-lg text-black"
+                        placeholder="New York, NY"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-black text-left">
+                      Description
+                    </label>
+                    <textarea
+                      value={tempData.description || ""}
+                      onChange={(e) =>
+                        setTempData({
+                          ...tempData,
+                          description: e.target.value,
+                        })
+                      }
+                      className="w-full p-2 border rounded-lg text-black h-24"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-black text-left">
+                      Skills (comma-separated)
+                    </label>
+                    <input
+                      type="text"
+                      value={tempData.skills ? tempData.skills.join(", ") : ""}
+                      onChange={(e) =>
+                        handleArrayField("skills", e.target.value)
+                      }
+                      className="w-full p-2 border rounded-lg text-black"
+                      placeholder="JavaScript, React, Node.js"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSave}
+                      disabled={loading}
+                      className="bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {loading ? (
+                        <RefreshCw size={16} className="animate-spin" />
+                      ) : (
+                        <Save size={16} />
+                      )}
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditMode(null)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                    >
+                      <X size={16} />
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit("experiences", index)}
-                    className="text-teal-600 hover:text-teal-700"
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete("experiences", index)}
-                    className="text-red-600 hover:text-red-700"
-                    disabled={loading}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+              ) : (
+                // Display experience
+                <div className="flex text-left text-black">
+                  <div>
+                    <h4 className="font-medium">{experience.title}</h4>
+                    <p className="text-teal-600">{experience.company}</p>
+                    <p className="text-sm text-black">
+                      {experience.duration} • {experience.location}
+                    </p>
+                    <p className="text-sm text-black mt-1">
+                      {experience.description}
+                    </p>
+                    {experience.skills && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {experience.skills.map((skill, skillIndex) => (
+                          <span
+                            key={skillIndex}
+                            className="px-2 py-1 bg-gray-100 text-xs rounded"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit("experiences", index)}
+                      className="text-teal-600 hover:text-teal-700"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete("experiences", index)}
+                      className="text-red-600 hover:text-red-700"
+                      disabled={loading}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ))}
 
@@ -1058,8 +1297,10 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
               <a
                 href="/"
                 className="text-black hover:text-black flex items-center gap-2"
-                target="_blank"
-                rel="noopener noreferrer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open("/", "_blank");
+                }}
               >
                 <Eye size={16} />
                 View Site

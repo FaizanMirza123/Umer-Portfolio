@@ -75,7 +75,7 @@ const Navbar = ({ onAdminClick }) => {
             <div className="hidden md:flex items-center space-x-2">
               <button
                 onClick={() => scrollToSection("projects")}
-                className="group relative text-black-700 dark:text-black-300 hover:text-teal-600 dark:hover:text-teal-400 px-6 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105"
+                className="group relative text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 px-6 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105"
               >
                 <span className="relative z-10">Projects</span>
                 <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-teal-500 to-blue-500 group-hover:w-full transition-all duration-300 rounded-full"></div>
@@ -83,7 +83,7 @@ const Navbar = ({ onAdminClick }) => {
               </button>
               <button
                 onClick={() => scrollToSection("experiences")}
-                className="group relative text-black-700 dark:text-black-300 hover:text-teal-600 dark:hover:text-teal-400 px-6 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105"
+                className="group relative text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 px-6 py-3 text-lg font-semibold transition-all duration-300 transform hover:scale-105"
               >
                 <span className="relative z-10">Experiences</span>
                 <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-teal-500 to-blue-500 group-hover:w-full transition-all duration-300 rounded-full"></div>
@@ -141,10 +141,10 @@ const Navbar = ({ onAdminClick }) => {
             isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="py-6 space-y-2 bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl mt-4 border border-gray-200">
+          <div className="py-6 space-y-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-2xl mt-4 border border-gray-200 dark:border-gray-700">
             <button
               onClick={() => scrollToSection("projects")}
-              className="group w-full text-left px-6 py-4 text-lg font-semibold text-black-700 hover:text-teal-600 hover:bg-teal-50 transition-all duration-300 rounded-xl mx-2"
+              className="group w-full text-left px-6 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all duration-300 rounded-xl mx-2"
             >
               <span className="flex items-center">
                 Projects
@@ -153,7 +153,7 @@ const Navbar = ({ onAdminClick }) => {
             </button>
             <button
               onClick={() => scrollToSection("experiences")}
-              className="group w-full text-left px-6 py-4 text-lg font-semibold text-black-700 hover:text-teal-600 hover:bg-teal-50 transition-all duration-300 rounded-xl mx-2"
+              className="group w-full text-left px-6 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-all duration-300 rounded-xl mx-2"
             >
               <span className="flex items-center">
                 Experiences

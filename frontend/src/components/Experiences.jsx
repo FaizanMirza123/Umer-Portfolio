@@ -52,11 +52,11 @@ const Experiences = ({ experiences }) => {
 
                     {/* Content Card */}
                     <div className="flex-grow">
-                      <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-white/20 card-hover">
+                      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-white/20 dark:border-gray-700/20 card-hover">
                         {/* Header */}
                         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-6">
                           <div className="flex-grow">
-                            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-black-900 mb-2 group-hover:text-teal-600 transition-colors duration-300">
+                            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-teal-600 transition-colors duration-300">
                               {experience.title}
                             </h3>
                             <h4 className="text-xl sm:text-2xl md:text-3xl font-semibold text-teal-600 mb-4 flex items-center gap-2">
@@ -65,19 +65,19 @@ const Experiences = ({ experiences }) => {
                             </h4>
                           </div>
 
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-lg text-black-500 lg:text-right">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-lg text-gray-600 dark:text-gray-300 lg:text-right">
                             {experience.duration && (
-                              <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
+                              <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-full">
                                 <Calendar size={18} className="text-teal-600" />
-                                <span className="font-medium">
+                                <span className="font-medium text-gray-700 dark:text-gray-200">
                                   {experience.duration}
                                 </span>
                               </div>
                             )}
                             {experience.location && (
-                              <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
+                              <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-full">
                                 <MapPin size={18} className="text-blue-600" />
-                                <span className="font-medium">
+                                <span className="font-medium text-gray-700 dark:text-gray-200">
                                   {experience.location}
                                 </span>
                               </div>
@@ -88,7 +88,7 @@ const Experiences = ({ experiences }) => {
                         {/* Description */}
                         {experience.description && (
                           <div className="mb-6">
-                            <p className="text-black-700 text-lg sm:text-xl leading-relaxed">
+                            <p className="text-gray-700 dark:text-gray-300 text-lg sm:text-xl leading-relaxed">
                               {experience.description}
                             </p>
                           </div>
@@ -100,7 +100,7 @@ const Experiences = ({ experiences }) => {
                             {experience.skills.map((skill, skillIndex) => (
                               <span
                                 key={skillIndex}
-                                className="group/skill px-4 py-2 bg-gradient-to-r from-teal-100 to-blue-100 text-teal-800 text-base sm:text-lg rounded-full font-medium hover:from-teal-200 hover:to-blue-200 transition-all duration-300 transform hover:scale-110 cursor-default"
+                                className="group/skill px-4 py-2 bg-gradient-to-r from-teal-100 to-blue-100 dark:from-teal-800/20 dark:to-blue-800/20 text-teal-800 dark:text-teal-200 text-base sm:text-lg rounded-full font-medium hover:from-teal-200 hover:to-blue-200 dark:hover:from-teal-700/30 dark:hover:to-blue-700/30 transition-all duration-300 transform hover:scale-110 cursor-default"
                               >
                                 <TrendingUp
                                   className="inline mr-1 group-hover/skill:animate-bounce"
@@ -120,10 +120,13 @@ const Experiences = ({ experiences }) => {
           </div>
         ) : (
           <div className="text-center py-20 animate-fade-in-up">
-            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-slow">
-              <Briefcase className="text-black-400" size={48} />
+            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce-slow">
+              <Briefcase
+                className="text-gray-400 dark:text-gray-500"
+                size={48}
+              />
             </div>
-            <p className="text-black-500 text-2xl">
+            <p className="text-gray-500 dark:text-gray-400 text-2xl">
               No experiences available yet.
             </p>
           </div>

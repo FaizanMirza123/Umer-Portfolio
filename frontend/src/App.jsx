@@ -1,4 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import FeaturedWork from "./components/FeaturedWork";
@@ -13,6 +20,8 @@ import "./App.css";
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [portfolioData, setPortfolioData] = useState({
     hero: {
       name: "Umer Saeed",
@@ -68,59 +77,52 @@ function App() {
     }
   }, [portfolioData.settings]);
 
-  // Fetch portfolio data on component mount
+  const fetchPortfolioData = async () => {
+    try {
+      const data = await portfolioAPI.getAll();
+      setPortfolioData({
+        hero: data.hero || portfolioData.hero,
+        featured_projects: data.featured_projects || [],
+        projects: data.projects || [],
+        experiences: data.experiences || [],
+        settings: data.settings || { font_size: "medium", theme: "light" },
+      });
+    } catch (error) {
+      console.error("Error fetching portfolio data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchPortfolioData = async () => {
-      try {
-        const data = await portfolioAPI.getAll();
-        setPortfolioData({
-          hero: data.hero || portfolioData.hero,
-          featured_projects: data.featured_projects || [],
-          projects: data.projects || [],
-          experiences: data.experiences || [],
-          settings: data.settings || { font_size: "medium", theme: "light" },
-        });
-      } catch (error) {
-        console.error("Error fetching portfolio data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPortfolioData();
   }, []);
+  // Fetch portfolio data on component mount
 
   const handleAdminLogin = (success, token) => {
     if (success && token) {
       setIsAdmin(true);
       setShowAdminLogin(false);
       localStorage.setItem("adminToken", token);
+      navigate("/admin");
     }
   };
 
   const handleAdminLogout = () => {
     setIsAdmin(false);
     localStorage.removeItem("adminToken");
+    navigate("/");
   };
 
-  if (showAdminLogin) {
-    return (
-      <AdminLogin
-        onLogin={handleAdminLogin}
-        onCancel={() => setShowAdminLogin(false)}
-      />
-    );
-  }
-
-  if (isAdmin) {
-    return (
-      <AdminDashboard
-        portfolioData={portfolioData}
-        setPortfolioData={setPortfolioData}
-        onLogout={handleAdminLogout}
-      />
-    );
-  }
+  const PortfolioHome = () => (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans w-full overflow-x-hidden transition-colors duration-300">
+      <Navbar onAdminClick={() => navigate("/admin-login")} />
+      <Hero data={portfolioData.hero} />
+      <FeaturedWork projects={portfolioData.featured_projects} />
+      <Projects projects={portfolioData.projects} />
+      <Experiences experiences={portfolioData.experiences} />
+      <Footer settings={portfolioData.settings} />
+    </div>
+  );
 
   if (loading) {
     return (
@@ -134,14 +136,36 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans w-full overflow-x-hidden transition-colors duration-300">
-      <Navbar onAdminClick={() => setShowAdminLogin(true)} />
-      <Hero data={portfolioData.hero} />
-      <FeaturedWork projects={portfolioData.featured_projects} />
-      <Projects projects={portfolioData.projects} />
-      <Experiences experiences={portfolioData.experiences} />
-      <Footer settings={portfolioData.settings} />
-    </div>
+    <Routes>
+      <Route path="/" element={<PortfolioHome />} />
+      <Route
+        path="/admin-login"
+        element={
+          isAdmin ? (
+            <Navigate to="/admin" replace />
+          ) : (
+            <AdminLogin
+              onLogin={handleAdminLogin}
+              onCancel={() => navigate("/")}
+            />
+          )
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          isAdmin ? (
+            <AdminDashboard
+              portfolioData={portfolioData}
+              setPortfolioData={setPortfolioData}
+              onLogout={handleAdminLogout}
+            />
+          ) : (
+            <Navigate to="/admin-login" replace />
+          )
+        }
+      />
+    </Routes>
   );
 }
 
