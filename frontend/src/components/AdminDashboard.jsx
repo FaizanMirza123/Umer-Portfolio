@@ -71,11 +71,22 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
     if (section === "hero") {
       setTempData({ ...portfolioData.hero });
     } else if (index !== null) {
+      let data;
       if (section === "featured") {
-        setTempData({ ...portfolioData.featured_projects[index] });
+        data = { ...portfolioData.featured_projects[index] };
       } else {
-        setTempData({ ...portfolioData[section][index] });
+        data = { ...portfolioData[section][index] };
       }
+
+      // Convert arrays to strings for editing
+      if (data.technologies && Array.isArray(data.technologies)) {
+        data.technologies = data.technologies.join(", ");
+      }
+      if (data.skills && Array.isArray(data.skills)) {
+        data.skills = data.skills.join(", ");
+      }
+
+      setTempData(data);
     } else {
       // New item
       const defaultData = {
@@ -85,7 +96,7 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
           image: "",
           github_url: "",
           live_url: "",
-          technologies: [],
+          technologies: "",
           is_featured: true,
         },
         projects: {
@@ -94,7 +105,7 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
           image: "",
           github_url: "",
           live_url: "",
-          technologies: [],
+          technologies: "",
           is_featured: false,
         },
         experiences: {
@@ -103,7 +114,7 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
           duration: "",
           location: "",
           description: "",
-          skills: [],
+          skills: "",
         },
       };
       setTempData(defaultData[section] || {});
@@ -131,7 +142,7 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
           image: tempData.image,
           github_url: tempData.github_url || tempData.githubUrl,
           live_url: tempData.live_url || tempData.liveUrl,
-          technologies: tempData.technologies || [],
+          technologies: convertStringToArray(tempData.technologies),
           is_featured: section === "featured" || tempData.is_featured,
         };
 
@@ -153,7 +164,7 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
           duration: tempData.duration,
           location: tempData.location,
           description: tempData.description,
-          skills: tempData.skills || [],
+          skills: convertStringToArray(tempData.skills),
         };
 
         if (index !== null) {
@@ -215,13 +226,21 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
   };
 
   const handleArrayField = (field, value) => {
+    // Store the raw string value, don't split immediately
     setTempData({
       ...tempData,
-      [field]: value
+      [field]: value,
+    });
+  };
+
+  const convertStringToArray = (value) => {
+    if (typeof value === "string") {
+      return value
         .split(",")
         .map((item) => item.trim())
-        .filter((item) => item),
-    });
+        .filter((item) => item);
+    }
+    return Array.isArray(value) ? value : [];
   };
 
   const handleToggleFeatured = async (projectId, currentFeaturedStatus) => {
@@ -463,7 +482,11 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
               <input
                 type="text"
                 value={
-                  tempData.technologies ? tempData.technologies.join(", ") : ""
+                  typeof tempData.technologies === "string"
+                    ? tempData.technologies
+                    : Array.isArray(tempData.technologies)
+                    ? tempData.technologies.join(", ")
+                    : ""
                 }
                 onChange={(e) =>
                   handleArrayField("technologies", e.target.value)
@@ -583,7 +606,9 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
                     <input
                       type="text"
                       value={
-                        tempData.technologies
+                        typeof tempData.technologies === "string"
+                          ? tempData.technologies
+                          : Array.isArray(tempData.technologies)
                           ? tempData.technologies.join(", ")
                           : ""
                       }
@@ -806,7 +831,13 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
               </label>
               <input
                 type="text"
-                value={tempData.skills ? tempData.skills.join(", ") : ""}
+                value={
+                  typeof tempData.skills === "string"
+                    ? tempData.skills
+                    : Array.isArray(tempData.skills)
+                    ? tempData.skills.join(", ")
+                    : ""
+                }
                 onChange={(e) => handleArrayField("skills", e.target.value)}
                 className="w-full p-2 border rounded-lg text-black"
                 placeholder="JavaScript, React, Node.js"
@@ -929,7 +960,13 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
                     </label>
                     <input
                       type="text"
-                      value={tempData.skills ? tempData.skills.join(", ") : ""}
+                      value={
+                        typeof tempData.skills === "string"
+                          ? tempData.skills
+                          : Array.isArray(tempData.skills)
+                          ? tempData.skills.join(", ")
+                          : ""
+                      }
                       onChange={(e) =>
                         handleArrayField("skills", e.target.value)
                       }
