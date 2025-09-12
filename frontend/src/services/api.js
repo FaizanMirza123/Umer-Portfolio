@@ -68,6 +68,11 @@ export const projectAPI = {
     const response = await api.delete(`/projects/${projectId}`)
     return response.data
   },
+  
+  toggleFeatured: async (projectId) => {
+    const response = await api.patch(`/projects/${projectId}/toggle-featured`)
+    return response.data
+  },
 }
 
 // Experience endpoints
@@ -102,6 +107,21 @@ export const settingsAPI = {
   
   update: async (settingsData) => {
     const response = await api.put('/settings', settingsData)
+    return response.data
+  },
+}
+
+// File upload endpoint
+export const fileAPI = {
+  upload: async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    const response = await api.post('/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
     return response.data
   },
 }

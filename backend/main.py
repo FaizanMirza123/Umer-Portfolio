@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from passlib.context import CryptContext
@@ -8,6 +9,9 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from typing import List, Optional
 import json
+import os
+import uuid
+from pathlib import Path
 
 # Import local modules
 from db import get_db, engine
@@ -24,12 +28,19 @@ from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, ADMIN_USE
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+# Create uploads directory if it doesn't exist
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
 # Initialize FastAPI app
 app = FastAPI(
     title="Portfolio API",
     description="API for managing portfolio website content",
     version="1.0.0"
 )
+
+# Mount static files for uploads
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # Add CORS middleware
 app.add_middleware(
@@ -316,6 +327,74 @@ async def update_settings(
     db.commit()
     db.refresh(db_settings)
     return db_settings
+
+
+# File Upload Endpoint
+@app.post("/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: str = Depends(verify_token)
+):
+    """Upload an image file and return the URL"""
+    try:
+        # Validate file type
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(
+                status_code=400,
+                detail="Only image files are allowed"
+            )
+        
+        # Validate file size (max 5MB)
+        contents = await file.read()
+        if len(contents) > 5 * 1024 * 1024:
+            raise HTTPException(
+                status_code=400,
+                detail="File size must be less than 5MB"
+            )
+        
+        # Generate unique filename
+        file_extension = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
+        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        file_path = UPLOAD_DIR / unique_filename
+        
+        # Save the file
+        with open(file_path, "wb") as buffer:
+            buffer.write(contents)
+        
+        # Return the URL path
+        file_url = f"/uploads/{unique_filename}"
+        return {"message": "File uploaded successfully", "file_url": file_url}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Could not upload file: {str(e)}")
+
+
+# Toggle Project Featured Status
+@app.patch("/projects/{project_id}/toggle-featured")
+def toggle_project_featured(
+    project_id: int,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(verify_token)
+):
+    """Toggle the featured status of a project"""
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    # Toggle the featured status
+    project.is_featured = not project.is_featured
+    project.updated_at = datetime.utcnow()
+    
+    db.commit()
+    db.refresh(project)
+    
+    return {
+        "message": "Featured status updated successfully",
+        "project_id": project_id,
+        "is_featured": project.is_featured
+    }
 
 if __name__ == "__main__":
     import uvicorn

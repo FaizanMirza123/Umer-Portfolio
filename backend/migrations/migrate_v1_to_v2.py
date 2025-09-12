@@ -134,6 +134,8 @@ def run_migration():
             projects_columns = get_columns('projects')
             new_columns = []
             
+            if 'is_featured' not in projects_columns:
+                new_columns.append("ALTER TABLE projects ADD COLUMN is_featured INTEGER DEFAULT 0")
             if 'created_at' not in projects_columns:
                 new_columns.append("ALTER TABLE projects ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP")
             if 'updated_at' not in projects_columns:

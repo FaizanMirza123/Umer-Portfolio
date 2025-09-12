@@ -16,6 +16,7 @@ import {
   Settings,
   Palette,
   Type,
+  Heart,
 } from "lucide-react";
 import {
   heroAPI,
@@ -24,6 +25,7 @@ import {
   portfolioAPI,
   settingsAPI,
 } from "../services/api";
+import ImageUpload from "./ImageUpload";
 
 const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
   const [activeTab, setActiveTab] = useState("hero");
@@ -222,6 +224,19 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
     });
   };
 
+  const handleToggleFeatured = async (projectId, currentFeaturedStatus) => {
+    setLoading(true);
+    try {
+      await projectAPI.toggleFeatured(projectId);
+      await loadData(); // Refresh data to see the change
+    } catch (error) {
+      setError("Failed to toggle featured status");
+      console.error("Error toggling featured:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderHeroEditor = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -281,16 +296,15 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
 
           <div>
             <label className="block text-sm font-medium mb-2 text-black text-left">
-              Profile Image URL
+              Profile Image
             </label>
-            <input
-              type="url"
-              value={tempData.profile_image || tempData.profileImage || ""}
-              onChange={(e) =>
-                setTempData({ ...tempData, profile_image: e.target.value })
+            <ImageUpload
+              currentImage={
+                tempData.profile_image || tempData.profileImage || ""
               }
-              className="w-full p-2 border rounded-lg text-black"
-              placeholder="https://example.com/image.jpg"
+              onImageChange={(url) =>
+                setTempData({ ...tempData, profile_image: url })
+              }
             />
           </div>
 
@@ -404,15 +418,13 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
 
             <div>
               <label className="block text-sm font-medium mb-2 text-black text-left">
-                Image URL
+                Project Image
               </label>
-              <input
-                type="url"
-                value={tempData.image || ""}
-                onChange={(e) =>
-                  setTempData({ ...tempData, image: e.target.value })
+              <ImageUpload
+                currentImage={tempData.image || ""}
+                onImageChange={(url) =>
+                  setTempData({ ...tempData, image: url })
                 }
-                className="w-full p-2 border rounded-lg text-black"
               />
             </div>
 
@@ -526,15 +538,13 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
 
                   <div>
                     <label className="block text-sm font-medium mb-2 text-black text-left">
-                      Image URL
+                      Project Image
                     </label>
-                    <input
-                      type="url"
-                      value={tempData.image || ""}
-                      onChange={(e) =>
-                        setTempData({ ...tempData, image: e.target.value })
+                    <ImageUpload
+                      currentImage={tempData.image || ""}
+                      onImageChange={(url) =>
+                        setTempData({ ...tempData, image: url })
                       }
-                      className="w-full p-2 border rounded-lg text-black"
                     />
                   </div>
 
@@ -609,10 +619,18 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
                 </div>
               ) : (
                 // Display project
-                <div className="flex text-left text-black">
-                  <div>
-                    <h4 className="font-medium">{project.title}</h4>
-                    <p className="text-sm text-blackmt-1">
+                <div className="flex justify-between items-start text-left text-black">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium">{project.title}</h4>
+                      {project.is_featured && (
+                        <Star
+                          className="text-yellow-500 fill-current"
+                          size={16}
+                        />
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">
                       {project.description}
                     </p>
                     {project.technologies && (
@@ -628,17 +646,40 @@ const AdminDashboard = ({ portfolioData, setPortfolioData, onLogout }) => {
                       </div>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 ml-4">
+                    <button
+                      onClick={() =>
+                        handleToggleFeatured(project.id, project.is_featured)
+                      }
+                      className={`p-2 rounded-full transition-colors ${
+                        project.is_featured
+                          ? "text-yellow-500 hover:text-yellow-600 bg-yellow-50 hover:bg-yellow-100"
+                          : "text-gray-400 hover:text-yellow-500 hover:bg-yellow-50"
+                      }`}
+                      title={
+                        project.is_featured
+                          ? "Remove from featured"
+                          : "Add to featured"
+                      }
+                      disabled={loading}
+                    >
+                      <Heart
+                        size={16}
+                        className={project.is_featured ? "fill-current" : ""}
+                      />
+                    </button>
                     <button
                       onClick={() => handleEdit(section, index)}
-                      className="text-teal-600 hover:text-teal-700"
+                      className="text-teal-600 hover:text-teal-700 p-2 rounded-full hover:bg-teal-50"
+                      title="Edit project"
                     >
                       <Edit size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(section, index)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-red-600 hover:text-red-700 p-2 rounded-full hover:bg-red-50"
                       disabled={loading}
+                      title="Delete project"
                     >
                       <Trash2 size={16} />
                     </button>
